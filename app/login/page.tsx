@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 const primaryDark = "#143328";
@@ -26,6 +26,17 @@ export default function LoginPage() {
   const [regLoading, setRegLoading] = useState(false);
   const [regMessage, setRegMessage] = useState<string | null>(null);
   const [regError, setRegError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!cancelled && data.session) window.location.assign("/");
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
